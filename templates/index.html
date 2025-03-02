@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Article Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f5f3ef;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            height: 100vh;
+            overflow-y: auto; /* Allow page to scroll */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 850px;
+            background: #fff;
+            padding: 40px;
+            margin: 20px auto; /* Added margin to center container */
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border: 1px solid #dcdcdc;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            color: #2c2c2c;
+            font-weight: 700;
+            font-family: 'Playfair Display', serif;
+            text-transform: uppercase;
+        }
+
+        input {
+            width: 80%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background: #f9f9f9;
+            outline: none;
+        }
+
+        button {
+            padding: 12px 20px;
+            background: #ff6f61;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            box-shadow: 0 4px 10px rgba(255, 111, 97, 0.4);
+        }
+
+        button:hover {
+            background: #ff4c40;
+        }
+
+        .article-box {
+            margin-top: 20px;
+            padding: 30px;
+            text-align: left;
+            background: #fefefe;
+            border: 1px solid #dcdcdc;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            font-size: 18px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            animation: fadeIn 0.8s forwards;
+            font-family: 'Playfair Display', serif;
+            background: #fcf7f3 url('https://www.transparenttextures.com/patterns/notebook.png');
+        }
+
+        .copy-btn {
+            margin-top: 15px;
+            background: #50fa7b;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .heading {
+            font-size: 28px;
+            margin-bottom: 15px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid #222;
+            display: inline-block;
+            padding-bottom: 10px;
+            color: #2c2c2c;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📰 AI Article Generator</h1>
+    <form method="POST">
+        <input type="text" name="topic" placeholder="Enter a topic..." required>
+        <br>
+        <button type="submit">Generate Article</button>
+    </form>
+
+    {% if article %}
+    <div class="article-box">
+        <div class="heading">{{ heading }}</div>
+        <p id="article-text">{{ article }}</p>
+        <button class="copy-btn" onclick="copyText()">📋 Copy Article</button>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var text = `{{ article|safe }}`;
+        if (text.trim() !== "") {
+            text = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+            typeText(text);
+            setTimeout(() => {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+            }, 1000); // Automatically scroll to the article
+        }
+    });
+
+    function typeText(text) {
+        let index = 0;
+        let speed = 25;
+        let target = document.getElementById("article-text");
+        target.innerHTML = "";
+
+        function typeWriter() {
+            if (index < text.length) {
+                if (text.substring(index, index + 8) === "<strong>") {
+                    let tagEnd = text.indexOf("</strong>", index) + 9;
+                    target.innerHTML += text.substring(index, tagEnd);
+                    index = tagEnd;
+                } else {
+                    target.innerHTML += text[index];
+                    index++;
+                }
+                setTimeout(typeWriter, speed);
+            }
+        }
+        typeWriter();
+    }
+
+    function copyText() {
+        let text = document.getElementById("article-text").innerText;
+        navigator.clipboard.writeText(text);
+        alert("Article copied to clipboard! ✅");
+    }
+</script>
+</body>
+</html>
